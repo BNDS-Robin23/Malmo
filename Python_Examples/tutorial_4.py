@@ -27,7 +27,7 @@ import MalmoPython
 import os
 import sys
 import time
-import uuid
+
 
 if sys.version_info[0] == 2:
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)  # flush print output immediately
@@ -125,10 +125,9 @@ my_mission_record = MalmoPython.MissionRecordSpec()
 max_retries = 3
 for retry in range(max_retries):
     try:
-        experiment_id = str(uuid.uuid1())
         my_client_pool=MalmoPython.ClientPool()
-        my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10001))
-        agent_host.startMission(my_mission, my_client_pool, my_mission_record, 0, experiment_id)
+        my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
+        agent_host.startMission(my_mission, my_client_pool, my_mission_record, 0, "tutorial_4")
         break
     except RuntimeError as e:
         if retry == max_retries - 1:

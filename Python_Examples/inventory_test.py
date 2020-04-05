@@ -147,7 +147,9 @@ missionXML = '''<?xml version="1.0" encoding="UTF-8" ?>
         </AgentSection>
 
     </Mission>'''
+my_client_pool = MalmoPython.ClientPool()
 
+my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
 my_mission = MalmoPython.MissionSpec(missionXML,True)
 num_missions = 10 if agent_host.receivedArgument("test") else 30000
 for mission_no in range(num_missions):
@@ -156,7 +158,7 @@ for mission_no in range(num_missions):
     max_retries = 3
     for retry in range(max_retries):
         try:
-            agent_host.startMission( my_mission, my_mission_record )
+            agent_host.startMission( my_mission, my_client_pool, my_mission_record, 0, "inventory_test")
             break
         except RuntimeError as e:
             print(e)

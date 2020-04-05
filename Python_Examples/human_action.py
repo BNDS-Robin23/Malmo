@@ -40,7 +40,9 @@ else:
     import tkinter.messagebox
 from PIL import Image
 from PIL import ImageTk
+my_client_pool = MalmoPython.ClientPool()
 
+my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
 class HumanAgentHost(object):
 
     def __init__( self ):
@@ -116,9 +118,6 @@ class HumanAgentHost(object):
             time.sleep(0.2)
                 
         try:
-            my_client_pool = MalmoPython.ClientPool()
-
-            my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
             self.agent_host.startMission( my_mission, my_client_pool, my_mission_record, 0, "human_action")
         except RuntimeError as e:
             tkinter.messagebox.showerror("Error","Error starting mission: "+str(e))

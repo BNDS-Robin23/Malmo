@@ -37,7 +37,7 @@ import os
 import random
 import sys
 import time
-import uuid
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -305,7 +305,7 @@ my_client_pool = MalmoPython.ClientPool()
 
 my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
 
-experiment_id = str(uuid.uuid1())
+
 cumulative_rewards = []
 
 for i in range(num_repeats):
@@ -320,8 +320,7 @@ for i in range(num_repeats):
 
     for retry in range(max_retries):
         try:
-            
-            agent_host.startMission( my_mission, my_client_pool, my_mission_record, 0, experiment_id)
+            agent_host.startMission( my_mission, my_client_pool, my_mission_record, 0, "tutorial_6")
             break
         except RuntimeError as e:
             if retry == max_retries - 1:

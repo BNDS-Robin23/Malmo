@@ -706,6 +706,7 @@ class SalesmanAgent(threading.Thread):
         self.role = role
         self.route_generator = routeType
         self.client_pool = clientPool
+        
         self.mission_xml = missionXML
         self.agent_host = MalmoPython.AgentHost()
         self.mission = MalmoPython.MissionSpec(missionXML, True)
@@ -721,6 +722,7 @@ class SalesmanAgent(threading.Thread):
         while True:
             try:
                 # Attempt to start the mission:
+                
                 self.agent_host.startMission(self.mission, self.client_pool, self.mission_record, self.role, "TSPExperiment")
                 break
             except MalmoPython.MissionException as e:
