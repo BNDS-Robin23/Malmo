@@ -76,7 +76,8 @@ DEBUG = agent_hosts[0].receivedArgument("debug")
 SHOW_GUI = agent_hosts[0].receivedArgument("gui")
 INTEGRATION_TEST_MODE = agent_hosts[0].receivedArgument("test")
 agents_requested = agent_hosts[0].getIntArgument("agents")
-NUM_AGENTS = max(2,min(agents_requested,4))
+# NUM_AGENTS = max(2,min(agents_requested,4))
+NUM_AGENTS=2
 if NUM_AGENTS != agents_requested:
     print("WARNING: using", NUM_AGENTS, "agents, rather than", agents_requested)
 
@@ -370,7 +371,7 @@ def createMissionXML(num_agents, width, height, reset):
 # are attempting to find the server - so this will fail for any agents on a
 # different machine.
 client_pool = MalmoPython.ClientPool()
-for x in range(10000, 10000 + NUM_AGENTS):
+for x in range(10002, 10002 + NUM_AGENTS):
     client_pool.add( MalmoPython.ClientInfo('127.0.0.1', x) )
 
 failed_frames = [0 for x in range(NUM_AGENTS)] # keep a count of the frames that failed for each agent.

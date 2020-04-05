@@ -350,6 +350,7 @@ if agent_host.receivedArgument("test"):
 else:
     num_maps = 30000
 
+
 for imap in range(num_maps):
 
     # -- set up the agent -- #
@@ -380,7 +381,7 @@ for imap in range(num_maps):
         my_mission.drawBlock( x,45,z,"lava")
 
     my_clients = MalmoPython.ClientPool()
-    my_clients.add(MalmoPython.ClientInfo('127.0.0.1', 10000)) # add Minecraft machines here as available
+    my_clients.add(MalmoPython.ClientInfo('127.0.0.1', 10002)) # add Minecraft machines here as available
 
     max_retries = 3
     agentID = 0

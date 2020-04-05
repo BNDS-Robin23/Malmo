@@ -373,7 +373,9 @@ if recordingsDirectory:
 
 # Create agent to run all the missions:
 agent = CopyAgent(SIZE_X, SIZE_Z)
+my_client_pool = MalmoPython.ClientPool()
 
+my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
 for i in range(num_iterations):
     structure = createTestStructure(SIZE_X, SIZE_Z)
     missionXML, expected_reward = getMissionXML('"false"', structure)
@@ -386,7 +388,7 @@ for i in range(num_iterations):
     max_retries = 3
     for retry in range(max_retries):
         try:
-            agent_host.startMission( my_mission, my_mission_record )    
+            agent_host.startMission( my_mission, my_client_pool, my_mission_record, 0, "build_test") 
             break
         except RuntimeError as e:
             if retry == max_retries - 1:

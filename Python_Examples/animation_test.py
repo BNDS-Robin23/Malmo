@@ -148,7 +148,7 @@ missionXML = getMissionXML()
 my_mission = MalmoPython.MissionSpec(missionXML, validate)
 
 my_client_pool = MalmoPython.ClientPool()
-my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10000))
+my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
 
 if agent_host.receivedArgument("test"):
     num_reps = 1

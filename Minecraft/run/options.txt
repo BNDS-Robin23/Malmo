@@ -83,7 +83,7 @@ key_key.hotbar.8:9
 key_key.hotbar.9:10
 key_key.toggleMalmo:28
 key_key.handyTestHook:22
-soundCategory_master:0.0
+soundCategory_master:0.25165564
 soundCategory_music:1.0
 soundCategory_record:1.0
 soundCategory_weather:1.0

@@ -37,6 +37,17 @@ import os
 import random
 import sys
 import time
+import uuid
+import numpy as np
+import matplotlib.pyplot as plt
+
+gamma=0.99
+gamma_terminate=0.95
+gamma_decay=0.999
+eps=0.1
+eps_decay=0.99
+
+
 if sys.version_info[0] == 2:
     # Workaround for https://github.com/PythonCharmers/python-future/issues/262
     import Tkinter as tk
@@ -47,7 +58,7 @@ class TabQAgent(object):
     """Tabular Q-learning agent for discrete state/action spaces."""
 
     def __init__(self):
-        self.epsilon = 0.01 # chance of taking a random action instead of the best
+        self.epsilon = eps # chance of taking a random action instead of the best
 
         self.logger = logging.getLogger(__name__)
         if False: # True if you want to see more information
@@ -62,31 +73,35 @@ class TabQAgent(object):
         self.canvas = None
         self.root = None
 
-    def updateQTable( self, reward, current_state ):
+    def updateQTable( self, reward, current_state,count ):
         """Change q_table to reflect what we have learnt."""
         
         # retrieve the old action value from the Q-table (indexed by the previous state and the previous action)
         old_q = self.q_table[self.prev_s][self.prev_a]
         
         # TODO: what should the new action value be?
-        new_q = old_q
+        
+        new_q = old_q+reward*np.power(gamma,count-1)
+      
+        
+       
         
         # assign the new action value to the Q-table
         self.q_table[self.prev_s][self.prev_a] = new_q
         
-    def updateQTableFromTerminatingState( self, reward ):
+    def updateQTableFromTerminatingState( self, reward ,count):
         """Change q_table to reflect what we have learnt, after reaching a terminal state."""
         
         # retrieve the old action value from the Q-table (indexed by the previous state and the previous action)
         old_q = self.q_table[self.prev_s][self.prev_a]
         
         # TODO: what should the new action value be?
-        new_q = old_q
+        new_q = old_q+reward*np.power(gamma_terminate,count-1)
         
         # assign the new action value to the Q-table
         self.q_table[self.prev_s][self.prev_a] = new_q
         
-    def act(self, world_state, agent_host, current_r ):
+    def act(self, world_state, agent_host, current_r ,count):
         """take 1 action in response to the current world state"""
         
         obs_text = world_state.observations[-1].text
@@ -102,7 +117,7 @@ class TabQAgent(object):
 
         # update Q values
         if self.prev_s is not None and self.prev_a is not None:
-            self.updateQTable( current_r, current_s )
+            self.updateQTable( current_r, current_s,count )
 
         self.drawQ( curr_x = int(obs[u'XPos']), curr_y = int(obs[u'ZPos']) )
 
@@ -145,6 +160,9 @@ class TabQAgent(object):
         
         # main loop:
         world_state = agent_host.getWorldState()
+
+        action_count=0
+
         while world_state.is_mission_running:
 
             current_r = 0
@@ -159,7 +177,9 @@ class TabQAgent(object):
                     for reward in world_state.rewards:
                         current_r += reward.getValue()
                     if world_state.is_mission_running and len(world_state.observations)>0 and not world_state.observations[-1].text=="{}":
-                        total_reward += self.act(world_state, agent_host, current_r)
+                        total_reward += self.act(world_state, agent_host, current_r,action_count)
+                        action_count+=1
+                       
                         break
                     if not world_state.is_mission_running:
                         break
@@ -174,6 +194,8 @@ class TabQAgent(object):
                     for reward in world_state.rewards:
                         current_r += reward.getValue()
                 # allow time to stabilise after action
+
+                
                 while True:
                     time.sleep(0.1)
                     world_state = agent_host.getWorldState()
@@ -182,7 +204,9 @@ class TabQAgent(object):
                     for reward in world_state.rewards:
                         current_r += reward.getValue()
                     if world_state.is_mission_running and len(world_state.observations)>0 and not world_state.observations[-1].text=="{}":
-                        total_reward += self.act(world_state, agent_host, current_r)
+                        total_reward += self.act(world_state, agent_host, current_r,action_count)
+                        action_count+=1
+                      
                         break
                     if not world_state.is_mission_running:
                         break
@@ -193,7 +217,7 @@ class TabQAgent(object):
 
         # update Q values
         if self.prev_s is not None and self.prev_a is not None:
-            self.updateQTableFromTerminatingState( current_r )
+            self.updateQTableFromTerminatingState( current_r,action_count )
             
         self.drawQ()
     
@@ -267,7 +291,7 @@ with open(mission_file, 'r') as f:
     my_mission = MalmoPython.MissionSpec(mission_xml, True)
 # add 20% holes for interest
 for x in range(1,4):
-    for z in range(1,13):
+    for z in range(3,6):
         if random.random()<0.1:
             my_mission.drawBlock( x,45,z,"lava")
 
@@ -276,11 +300,19 @@ max_retries = 3
 if agent_host.receivedArgument("test"):
     num_repeats = 1
 else:
-    num_repeats = 150
+    num_repeats = 300
+my_client_pool = MalmoPython.ClientPool()
 
+my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
+
+experiment_id = str(uuid.uuid1())
 cumulative_rewards = []
-for i in range(num_repeats):
 
+for i in range(num_repeats):
+    eps*=eps_decay
+    # gamma*=gamma_decay
+    # gamma_terminate*=gamma_decay
+    print(eps)
     print()
     print('Repeat %d of %d' % ( i+1, num_repeats ))
     
@@ -288,7 +320,8 @@ for i in range(num_repeats):
 
     for retry in range(max_retries):
         try:
-            agent_host.startMission( my_mission, my_mission_record )
+            
+            agent_host.startMission( my_mission, my_client_pool, my_mission_record, 0, experiment_id)
             break
         except RuntimeError as e:
             if retry == max_retries - 1:
@@ -320,3 +353,6 @@ print("Done.")
 print()
 print("Cumulative rewards for all %d runs:" % num_repeats)
 print(cumulative_rewards)
+
+plt.plot(cumulative_rewards)
+plt.show()

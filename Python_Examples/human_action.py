@@ -116,7 +116,10 @@ class HumanAgentHost(object):
             time.sleep(0.2)
                 
         try:
-            self.agent_host.startMission( mission_spec, mission_record_spec )
+            my_client_pool = MalmoPython.ClientPool()
+
+            my_client_pool.add(MalmoPython.ClientInfo("127.0.0.1", 10002))
+            self.agent_host.startMission( my_mission, my_client_pool, my_mission_record, 0, "human_action")
         except RuntimeError as e:
             tkinter.messagebox.showerror("Error","Error starting mission: "+str(e))
             return
