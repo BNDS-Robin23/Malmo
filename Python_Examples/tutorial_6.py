@@ -39,11 +39,11 @@ import sys
 import time
 
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 gamma=0.99
 gamma_terminate=0.95
-gamma_decay=0.999
+gamma_decay=1
 eps=0.1
 eps_decay=0.99
 
@@ -81,7 +81,7 @@ class TabQAgent(object):
         
         # TODO: what should the new action value be?
         
-        new_q = old_q+reward*np.power(gamma,count-1)
+        new_q = old_q+reward
       
         
        
@@ -353,5 +353,3 @@ print()
 print("Cumulative rewards for all %d runs:" % num_repeats)
 print(cumulative_rewards)
 
-plt.plot(cumulative_rewards)
-plt.show()
